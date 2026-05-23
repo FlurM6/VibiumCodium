@@ -172,9 +172,9 @@ class Monster(Enum):
 class Character(Enum):
     """Main bosses - rare, powerful encounters"""
     FERNANDO = {"name": "Fernando", "hp": 12, "damage": 3, "xp": 50, "loot": 15, "role": "The Charmer"}
-    ASTLE = {"name": "Astle", "hp": 18, "damage": 4, "xp": 70, "loot": 30, "role": "The Warrior"}
+    ASTLE = {"name": "Astle", "hp": 50, "damage": 4, "xp": 70, "loot": 30, "role": "The Warrior"}
     FELIZIAN = {"name": "Felizian", "hp": 25, "damage": 5, "xp": 100, "loot": 50, "role": "The Sorcerer"}
-    IRENE = {"name": "Irene", "hp": 16, "damage": 4, "xp": 75, "loot": 35, "role": "The Assassin"}
+    IRENE = {"name": "Irene", "hp": 52, "damage": 4, "xp": 75, "loot": 35, "role": "The Assassin"}
     DIEGO = {"name": "Diego", "hp": 10, "damage": 2, "xp": 40, "loot": 20, "role": "The Traitor"}
     DARKO = {"name": "Darko", "hp": 35, "damage": 7, "xp": 150, "loot": 100, "role": "The Dark Lord"}
     KEANO = {"name": "Keano", "hp": 14, "damage": 3, "xp": 60, "loot": 25, "role": "The Mercenary"}

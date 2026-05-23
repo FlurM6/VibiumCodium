@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Cosmic Quest: The Dungeon Reckoning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="starfield"></div>
+    
+    <!-- Main Game Container -->
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <h1 class="game-title">🎬 COSMIC QUEST</h1>
+            <p class="game-subtitle">The Dungeon Reckoning</p>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Left Panel: Player Stats -->
+            <aside class="panel left-panel">
+                <div class="stats-container">
+                    <h2>⚔️ HERO</h2>
+                    
+                    <div class="stat-box">
+                        <label>HEALTH</label>
+                        <div class="health-bar-container">
+                            <div class="health-bar" id="playerHealthBar"></div>
+                        </div>
+                        <span class="stat-value" id="playerHP">100/100</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>LEVEL</label>
+                        <span class="stat-value" id="playerLevel">1</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>EXP</label>
+                        <div class="exp-bar-container">
+                            <div class="exp-bar" id="playerExpBar"></div>
+                        </div>
+                        <span class="stat-value" id="playerExp">0/100</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>GOLD</label>
+                        <span class="stat-value gold" id="playerGold">0</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>DAMAGE</label>
+                        <span class="stat-value damage" id="playerDamage">4</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>ROOM</label>
+                        <span class="stat-value" id="roomCount">0</span>
+                    </div>
+                </div>
+
+                <div class="kills-container">
+                    <h3>Defeated Foes</h3>
+                    <div class="kills-list" id="killsList"></div>
+                </div>
+            </aside>
+
+            <!-- Center Panel: Game Area -->
+            <div class="game-area">
+                <!-- Narrator Section -->
+                <div class="narrator-box">
+                    <div class="narrator-icon">📖</div>
+                    <div class="narrator-text" id="narratorText">
+                        Awaiting your command, brave warrior...
+                    </div>
+                </div>
+
+                <!-- Enemy Section -->
+                <div class="enemy-section" id="enemySection" style="display: none;">
+                    <div class="enemy-container">
+                        <div class="enemy-portrait" id="enemyPortrait"></div>
+                        <div class="enemy-info">
+                            <h2 id="enemyName">Enemy</h2>
+                            <div class="enemy-role" id="enemyRole"></div>
+                            <div class="health-bar-container">
+                                <div class="health-bar enemy" id="enemyHealthBar"></div>
+                            </div>
+                            <span class="stat-value" id="enemyHP">10/10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Description -->
+                <div class="room-description" id="roomDescription">
+                    You stand at the entrance of a vast, mysterious dungeon. The air is thick with ancient magic. What will you do?
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-explore" id="btnExplore">
+                        <span class="icon">🔍</span>
+                        <span class="text">Explore</span>
+                    </button>
+                    <button class="btn btn-fight" id="btnFight" style="display: none;">
+                        <span class="icon">⚔️</span>
+                        <span class="text">Fight</span>
+                    </button>
+                    <button class="btn btn-run" id="btnRun" style="display: none;">
+                        <span class="icon">🏃</span>
+                        <span class="text">Run</span>
+                    </button>
+                    <button class="btn btn-quit" id="btnQuit">
+                        <span class="icon">❌</span>
+                        <span class="text">Quit</span>
+                    </button>
+                </div>
+
+                <!-- Damage Indicator -->
+                <div class="damage-indicator" id="damageIndicator"></div>
+            </div>
+
+            <!-- Right Panel: Story/Log -->
+            <aside class="panel right-panel">
+                <h2>📜 STORY LOG</h2>
+                <div class="log-container" id="storyLog">
+                    <div class="log-entry">Game started. Your journey begins...</div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Game Over Modal -->
+        <div class="modal" id="gameOverModal" style="display: none;">
+            <div class="modal-content">
+                <h1 id="gameOverTitle">GAME OVER</h1>
+                <div class="modal-stats">
+                    <p>Level Reached: <strong id="finalLevel">1</strong></p>
+                    <p>Gold Collected: <strong id="finalGold">0</strong></p>
+                    <p>Enemies Defeated: <strong id="finalKills">0</strong></p>
+                    <p>Bosses Defeated: <strong id="finalBosses">0</strong></p>
+                </div>
+                <div class="modal-message" id="gameOverMessage"></div>
+                <button class="btn btn-restart" id="btnRestart">🔄 Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
