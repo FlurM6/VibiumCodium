@@ -68,6 +68,33 @@ class CosmicQuestGame {
         this.btnRun.addEventListener('click', () => this.runAway());
         this.btnQuit.addEventListener('click', () => this.quitGame());
         this.btnRestart.addEventListener('click', () => location.reload());
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+    }
+
+    handleKeyPress(event) {
+        const key = event.key.toLowerCase();
+        
+        // Shop keyboard navigation
+        if (document.getElementById('shopModal')?.style.display === 'flex') {
+            this.handleShopKeyboard(event);
+            return;
+        }
+
+        // Main game keyboard shortcuts
+        if (key === 'e') this.exploreRoom();
+        if (key === 'f') this.attackEnemy();
+        if (key === 'r') this.runAway();
+        if (key === 's') this.openShop?.();
+        if (key === 'q') this.quitGame();
+    }
+
+    handleShopKeyboard(event) {
+        // Placeholder - will be expanded when shop methods are available
+        if (event.key === 'Escape') {
+            this.closeShop?.();
+        }
     }
 
     // ============ GAME FLOW ============
