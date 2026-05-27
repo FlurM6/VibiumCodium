@@ -127,6 +127,13 @@
                 <div class="log-container" id="storyLog">
                     <div class="log-entry">Game started. Your journey begins...</div>
                 </div>
+
+                <div class="leaderboard-panel">
+                    <h2>🏆 LEADERBOARD</h2>
+                    <div class="leaderboard-list" id="leaderboardList">
+                        <div class="leaderboard-empty">No leaderboard entries yet. Finish a run to record your score!</div>
+                    </div>
+                </div>
             </aside>
         </main>
 
@@ -141,6 +148,12 @@
                     <p>Bosses Defeated: <strong id="finalBosses">0</strong></p>
                 </div>
                 <div class="modal-message" id="gameOverMessage"></div>
+                <div class="leaderboard-name-entry">
+                    <label for="leaderboardNameInput">Enter name for leaderboard</label>
+                    <input id="leaderboardNameInput" type="text" maxlength="20" placeholder="Hero" />
+                    <button class="btn btn-save-score" id="btnSaveScore">💾 Save Score</button>
+                    <div class="leaderboard-save-feedback" id="leaderboardSaveFeedback"></div>
+                </div>
                 <button class="btn btn-restart" id="btnRestart">🔄 Play Again</button>
             </div>
         </div>

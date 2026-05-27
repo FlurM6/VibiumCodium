@@ -13,9 +13,11 @@ class CosmicQuestGame {
             roomCount: 0,
             kills: [],
             bosses: [],
+            leaderboard: [],
             gameOver: false,
             victory: false
         };
+        this.leaderboardRecorded = false;
 
         this.battleState = {
             inBattle: false,
@@ -43,6 +45,7 @@ class CosmicQuestGame {
         this.playerDamageText = document.getElementById('playerDamage');
         this.roomCountText = document.getElementById('roomCount');
         this.killsList = document.getElementById('killsList');
+        this.leaderboardList = document.getElementById('leaderboardList');
         this.enemySection = document.getElementById('enemySection');
         this.enemyPortrait = document.getElementById('enemyPortrait');
         this.enemyName = document.getElementById('enemyName');
@@ -58,7 +61,11 @@ class CosmicQuestGame {
         this.btnRun = document.getElementById('btnRun');
         this.btnQuit = document.getElementById('btnQuit');
         this.btnRestart = document.getElementById('btnRestart');
+        this.btnSaveScore = document.getElementById('btnSaveScore');
+        this.leaderboardNameInput = document.getElementById('leaderboardNameInput');
+        this.leaderboardSaveFeedback = document.getElementById('leaderboardSaveFeedback');
 
+        this.loadLeaderboard();
         this.updateUI();
     }
 
@@ -68,6 +75,13 @@ class CosmicQuestGame {
         this.btnRun.addEventListener('click', () => this.runAway());
         this.btnQuit.addEventListener('click', () => this.quitGame());
         this.btnRestart.addEventListener('click', () => location.reload());
+        this.btnSaveScore.addEventListener('click', () => this.saveScore());
+        this.leaderboardNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.saveScore();
+            }
+        });
 
         // Keyboard controls
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
@@ -333,6 +347,17 @@ class CosmicQuestGame {
     }
 
     showGameOver(victory) {
+        this.leaderboardRecorded = false;
+        if (this.leaderboardNameInput) {
+            this.leaderboardNameInput.value = '';
+        }
+        if (this.btnSaveScore) {
+            this.btnSaveScore.disabled = false;
+        }
+        if (this.leaderboardSaveFeedback) {
+            this.leaderboardSaveFeedback.textContent = '';
+        }
+
         this.gameOverModal.style.display = 'flex';
         const titleEl = document.getElementById('gameOverTitle');
         const messageEl = document.getElementById('gameOverMessage');
@@ -357,6 +382,85 @@ class CosmicQuestGame {
         this.btnFight.disabled = true;
         this.btnRun.disabled = true;
         this.btnQuit.disabled = true;
+    }
+
+    recordLeaderboardEntry(victory, name = 'Anonymous') {
+        if (this.leaderboardRecorded) return;
+        this.leaderboardRecorded = true;
+
+        const entryName = name.trim() || 'Anonymous';
+        const entry = {
+            date: new Date().toISOString(),
+            name: entryName,
+            result: victory ? 'Escaped' : 'Fallen',
+            level: this.gameState.level,
+            gold: this.gameState.gold,
+            kills: this.gameState.kills.length,
+            bosses: this.gameState.bosses.length
+        };
+
+        this.gameState.leaderboard.push(entry);
+        this.gameState.leaderboard.sort((a, b) => {
+            if (b.level !== a.level) return b.level - a.level;
+            if (b.gold !== a.gold) return b.gold - a.gold;
+            if (b.kills !== a.kills) return b.kills - a.kills;
+            return new Date(b.date) - new Date(a.date);
+        });
+        this.gameState.leaderboard = this.gameState.leaderboard.slice(0, 5);
+        this.saveLeaderboard();
+        this.updateLeaderboardUI();
+    }
+
+    saveScore() {
+        if (this.leaderboardRecorded) return;
+        const name = this.leaderboardNameInput ? this.leaderboardNameInput.value : 'Anonymous';
+        this.recordLeaderboardEntry(this.gameState.victory, name);
+        if (this.btnSaveScore) this.btnSaveScore.disabled = true;
+        if (this.leaderboardSaveFeedback) this.leaderboardSaveFeedback.textContent = 'Score saved!';
+    }
+
+    loadLeaderboard() {
+        try {
+            const stored = localStorage.getItem('cosmicQuestLeaderboard');
+            this.gameState.leaderboard = stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            this.gameState.leaderboard = [];
+        }
+        this.updateLeaderboardUI();
+    }
+
+    saveLeaderboard() {
+        try {
+            localStorage.setItem('cosmicQuestLeaderboard', JSON.stringify(this.gameState.leaderboard));
+        } catch (error) {
+            console.warn('Unable to save leaderboard:', error);
+        }
+    }
+
+    updateLeaderboardUI() {
+        if (!this.leaderboardList) return;
+
+        if (this.gameState.leaderboard.length === 0) {
+            this.leaderboardList.innerHTML = '<div class="leaderboard-empty">No leaderboard entries yet. Finish a run to record your score!</div>';
+            return;
+        }
+
+        const html = this.gameState.leaderboard.map((entry, index) => {
+            const dateLabel = new Date(entry.date).toLocaleString();
+            const name = entry.name || 'Anonymous';
+            return `
+                <div class="leaderboard-item">
+                    <div>
+                        <span class="leaderboard-rank">#${index + 1}</span>
+                        <strong>${name}</strong> • ${entry.result} • ${dateLabel}
+                        <span class="leaderboard-meta">Level ${entry.level} • ${entry.gold} gold • ${entry.kills} kills • ${entry.bosses} bosses</span>
+                    </div>
+                    <div class="leaderboard-score">${entry.level}L</div>
+                </div>
+            `;
+        }).join('');
+
+        this.leaderboardList.innerHTML = html;
     }
 
     // ============ UI UPDATES ============
