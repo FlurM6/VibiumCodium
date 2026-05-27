@@ -13,6 +13,8 @@ class CosmicQuestGame {
             roomCount: 0,
             kills: [],
             bosses: [],
+            elementalUses: { fire: 3, water: 3, earth: 3 },
+            maxElementalUses: 3,
             leaderboard: [],
             gameOver: false,
             victory: false
@@ -47,6 +49,7 @@ class CosmicQuestGame {
         this.killsList = document.getElementById('killsList');
         this.leaderboardList = document.getElementById('leaderboardList');
         this.enemySection = document.getElementById('enemySection');
+        this.attackEffect = document.getElementById('attackEffect');
         this.enemyPortrait = document.getElementById('enemyPortrait');
         this.enemyName = document.getElementById('enemyName');
         this.enemyRole = document.getElementById('enemyRole');
@@ -57,7 +60,14 @@ class CosmicQuestGame {
         this.gameOverModal = document.getElementById('gameOverModal');
 
         this.btnExplore = document.getElementById('btnExplore');
-        this.btnFight = document.getElementById('btnFight');
+        this.btnAttackGeneral = document.getElementById('btnAttackGeneral');
+        this.btnAttackFire = document.getElementById('btnAttackFire');
+        this.btnAttackWater = document.getElementById('btnAttackWater');
+        this.btnAttackEarth = document.getElementById('btnAttackEarth');
+        this.attackCountGeneral = document.getElementById('attackCountGeneral');
+        this.attackCountFire = document.getElementById('attackCountFire');
+        this.attackCountWater = document.getElementById('attackCountWater');
+        this.attackCountEarth = document.getElementById('attackCountEarth');
         this.btnRun = document.getElementById('btnRun');
         this.btnQuit = document.getElementById('btnQuit');
         this.btnRestart = document.getElementById('btnRestart');
@@ -71,7 +81,10 @@ class CosmicQuestGame {
 
     setupEventListeners() {
         this.btnExplore.addEventListener('click', () => this.exploreRoom());
-        this.btnFight.addEventListener('click', () => this.attackEnemy());
+        this.btnAttackGeneral.addEventListener('click', () => this.attackEnemy('general'));
+        this.btnAttackFire.addEventListener('click', () => this.attackEnemy('fire'));
+        this.btnAttackWater.addEventListener('click', () => this.attackEnemy('water'));
+        this.btnAttackEarth.addEventListener('click', () => this.attackEnemy('earth'));
         this.btnRun.addEventListener('click', () => this.runAway());
         this.btnQuit.addEventListener('click', () => this.quitGame());
         this.btnRestart.addEventListener('click', () => location.reload());
@@ -98,7 +111,12 @@ class CosmicQuestGame {
 
         // Main game keyboard shortcuts
         if (key === 'e') this.exploreRoom();
-        if (key === 'f') this.attackEnemy();
+        if (this.battleState.inBattle) {
+            if (key === 'f' || key === '1') this.attackEnemy('general');
+            if (key === '2') this.attackEnemy('fire');
+            if (key === '3') this.attackEnemy('water');
+            if (key === '4') this.attackEnemy('earth');
+        }
         if (key === 'r') this.runAway();
         if (key === 's') this.openShop?.();
         if (key === 'q') this.quitGame();
@@ -145,14 +163,14 @@ class CosmicQuestGame {
 
     spawnMonster() {
         const monsters = [
-            { name: 'Goblin', hp: 6, damage: 2, xp: 10, loot: 5, emoji: '👺' },
-            { name: 'Orc', hp: 12, damage: 3, xp: 20, loot: 15, emoji: '🗡️' },
-            { name: 'Skeleton', hp: 10, damage: 2, xp: 15, loot: 10, emoji: '💀' },
-            { name: 'Cave Spider', hp: 8, damage: 3, xp: 12, loot: 8, emoji: '🕷️' },
-            { name: 'Shadow Beast', hp: 14, damage: 4, xp: 25, loot: 20, emoji: '🐺' },
-            { name: 'Flame Elemental', hp: 11, damage: 4, xp: 22, loot: 18, emoji: '🔥' },
-            { name: 'Frost Wraith', hp: 9, damage: 3, xp: 18, loot: 12, emoji: '❄️' },
-            { name: 'Stone Golem', hp: 18, damage: 3, xp: 35, loot: 30, emoji: '🪨' }
+            { name: 'Goblin', hp: 6, damage: 2, xp: 10, loot: 5, emoji: '👺', element: 'earth' },
+            { name: 'Orc', hp: 12, damage: 3, xp: 20, loot: 15, emoji: '🗡️', element: 'earth' },
+            { name: 'Skeleton', hp: 10, damage: 2, xp: 15, loot: 10, emoji: '💀', element: 'fire' },
+            { name: 'Cave Spider', hp: 8, damage: 3, xp: 12, loot: 8, emoji: '🕷️', element: 'earth' },
+            { name: 'Shadow Beast', hp: 14, damage: 4, xp: 25, loot: 20, emoji: '🐺', element: 'water' },
+            { name: 'Flame Elemental', hp: 11, damage: 4, xp: 22, loot: 18, emoji: '🔥', element: 'fire' },
+            { name: 'Frost Wraith', hp: 9, damage: 3, xp: 18, loot: 12, emoji: '❄️', element: 'water' },
+            { name: 'Stone Golem', hp: 18, damage: 3, xp: 35, loot: 30, emoji: '🪨', element: 'earth' }
         ];
 
         const monster = monsters[Math.floor(Math.random() * monsters.length)];
@@ -165,24 +183,23 @@ class CosmicQuestGame {
             enemyXP: monster.xp,
             enemyLoot: monster.loot,
             enemyType: 'monster',
+            element: monster.element,
             emoji: monster.emoji,
             role: `A menacing ${monster.name} appears!`
         };
 
         this.narrate(`Something STIRS in the darkness! A ${monster.name} EMERGES!`);
         this.showBattle();
-        this.btnFight.style.display = 'flex';
-        this.btnRun.style.display = 'flex';
     }
 
     spawnBoss() {
         const bosses = [
-            { name: 'Fernando', hp: 12, damage: 3, xp: 50, loot: 15, emoji: '🎭', role: 'The Charmer' },
-            { name: 'Astle', hp: 18, damage: 4, xp: 70, loot: 30, emoji: '⚔️', role: 'The Warrior' },
-            { name: 'Felizian', hp: 25, damage: 5, xp: 100, loot: 50, emoji: '🧙', role: 'The Sorcerer' },
-            { name: 'Irene', hp: 16, damage: 4, xp: 75, loot: 35, emoji: '🗡️', role: 'The Assassin' },
-            { name: 'Darko', hp: 35, damage: 7, xp: 150, loot: 100, emoji: '👿', role: 'The Dark Lord' },
-            { name: 'Meera', hp: 28, damage: 6, xp: 120, loot: 75, emoji: '⚡', role: 'The Betrayer' }
+            { name: 'Fernando', hp: 12, damage: 3, xp: 50, loot: 15, emoji: '🎭', role: 'The Charmer', element: 'fire' },
+            { name: 'Astle', hp: 18, damage: 4, xp: 70, loot: 30, emoji: '⚔️', role: 'The Warrior', element: 'earth' },
+            { name: 'Felizian', hp: 25, damage: 5, xp: 100, loot: 50, emoji: '🧙', role: 'The Sorcerer', element: 'water' },
+            { name: 'Irene', hp: 16, damage: 4, xp: 75, loot: 35, emoji: '🗡️', role: 'The Assassin', element: 'fire' },
+            { name: 'Darko', hp: 35, damage: 7, xp: 150, loot: 100, emoji: '👿', role: 'The Dark Lord', element: 'earth' },
+            { name: 'Meera', hp: 28, damage: 6, xp: 120, loot: 75, emoji: '⚡', role: 'The Betrayer', element: 'water' }
         ];
 
         const boss = bosses[Math.floor(Math.random() * bosses.length)];
@@ -195,14 +212,13 @@ class CosmicQuestGame {
             enemyXP: boss.xp,
             enemyLoot: boss.loot,
             enemyType: 'boss',
+            element: boss.element,
             emoji: boss.emoji,
             role: boss.role
         };
 
         this.narrate(`AT LAST! A figure of POWER emerges from the shadows! It's ${boss.name}, ${boss.role}!`);
         this.showBattle();
-        this.btnFight.style.display = 'flex';
-        this.btnRun.style.display = 'flex';
     }
 
     findTreasure() {
@@ -233,22 +249,47 @@ class CosmicQuestGame {
         this.showExplore();
     }
 
-    attackEnemy() {
+    attackEnemy(attackType = 'general') {
         if (!this.battleState.inBattle) return;
 
-        // Player attack
-        const playerDamage = this.gameState.baseDamage + Math.floor(Math.random() * 5);
-        this.battleState.enemyHP -= playerDamage;
+        const elementName = this.battleState.element || 'none';
+        const enemyName = this.battleState.enemyName;
+        const typeLabel = attackType === 'general'
+            ? 'Basic Strike'
+            : `${attackType.charAt(0).toUpperCase() + attackType.slice(1)} Attack`;
 
-        this.showDamage(playerDamage, 'player');
-        this.addLog(`You dealt ${playerDamage} damage to ${this.battleState.enemyName}!`, 'combat');
-
-        if (this.battleState.enemyHP <= 0) {
-            this.defeatEnemy();
-            return;
+        if (attackType !== 'general') {
+            const remaining = this.gameState.elementalUses[attackType];
+            if (!remaining || remaining <= 0) {
+                this.addLog(`No ${attackType} attacks remaining!`, 'warning');
+                return;
+            }
+            this.gameState.elementalUses[attackType] -= 1;
         }
 
+        let damage = this.gameState.baseDamage + (attackType === 'general'
+            ? Math.floor(Math.random() * 4)
+            : 3 + Math.floor(Math.random() * 5));
+        let effectiveness = '';
+
+        if (attackType !== 'general' && attackType === elementName) {
+            damage = Math.ceil(damage * 1.5);
+            effectiveness = ' It is super effective!';
+        }
+
+        this.battleState.enemyHP -= damage;
+        this.showAttackAnimation(attackType);
+        this.showDamage(damage, 'player');
+        this.addLog(`You used ${typeLabel} and dealt ${damage} damage to ${enemyName}!${effectiveness}`, 'combat');
         this.updateEnemyHealth();
+        this.updateUI();
+
+        if (this.battleState.enemyHP <= 0) {
+            setTimeout(() => {
+                this.defeatEnemy();
+            }, 700);
+            return;
+        }
 
         // Enemy counter-attack
         setTimeout(() => {
@@ -256,7 +297,7 @@ class CosmicQuestGame {
             this.gameState.playerHP -= enemyDamage;
 
             this.showDamage(enemyDamage, 'enemy');
-            this.addLog(`${this.battleState.enemyName} dealt ${enemyDamage} damage to you!`, 'combat');
+            this.addLog(`${enemyName} dealt ${enemyDamage} damage to you!`, 'combat');
 
             if (this.gameState.playerHP <= 0) {
                 this.playerDeath();
@@ -328,9 +369,10 @@ class CosmicQuestGame {
         this.gameState.baseDamage += 1;
         this.gameState.xp -= this.gameState.xpToNextLevel;
         this.gameState.xpToNextLevel = Math.floor(this.gameState.xpToNextLevel * 1.1);
+        this.restockElementalAttacks();
 
         this.narrate(`LEVEL UP! You are now level ${this.gameState.level}! Your power increases!`);
-        this.addLog(`⬆️ LEVEL UP! Now level ${this.gameState.level}!`, 'victory');
+        this.addLog(`⬆️ LEVEL UP! Now level ${this.gameState.level}! Elemental attacks have been restocked.`, 'victory');
     }
 
     playerDeath() {
@@ -379,7 +421,10 @@ class CosmicQuestGame {
 
         // Disable buttons
         this.btnExplore.disabled = true;
-        this.btnFight.disabled = true;
+        this.btnAttackGeneral.disabled = true;
+        this.btnAttackFire.disabled = true;
+        this.btnAttackWater.disabled = true;
+        this.btnAttackEarth.disabled = true;
         this.btnRun.disabled = true;
         this.btnQuit.disabled = true;
     }
@@ -417,6 +462,13 @@ class CosmicQuestGame {
         this.recordLeaderboardEntry(this.gameState.victory, name);
         if (this.btnSaveScore) this.btnSaveScore.disabled = true;
         if (this.leaderboardSaveFeedback) this.leaderboardSaveFeedback.textContent = 'Score saved!';
+    }
+
+    restockElementalAttacks() {
+        this.gameState.elementalUses.fire = this.gameState.maxElementalUses;
+        this.gameState.elementalUses.water = this.gameState.maxElementalUses;
+        this.gameState.elementalUses.earth = this.gameState.maxElementalUses;
+        this.updateUI();
     }
 
     loadLeaderboard() {
@@ -484,6 +536,15 @@ class CosmicQuestGame {
         // Room count
         this.roomCountText.textContent = this.gameState.roomCount;
 
+        // Elemental attack counts
+        if (this.attackCountGeneral) this.attackCountGeneral.textContent = '∞';
+        if (this.attackCountFire) this.attackCountFire.textContent = this.gameState.elementalUses.fire;
+        if (this.attackCountWater) this.attackCountWater.textContent = this.gameState.elementalUses.water;
+        if (this.attackCountEarth) this.attackCountEarth.textContent = this.gameState.elementalUses.earth;
+        if (this.btnAttackFire) this.btnAttackFire.disabled = this.gameState.elementalUses.fire <= 0;
+        if (this.btnAttackWater) this.btnAttackWater.disabled = this.gameState.elementalUses.water <= 0;
+        if (this.btnAttackEarth) this.btnAttackEarth.disabled = this.gameState.elementalUses.earth <= 0;
+
         // Update kills list
         this.updateKillsList();
     }
@@ -516,13 +577,24 @@ class CosmicQuestGame {
         this.enemySection.style.display = 'block';
         this.enemyPortrait.textContent = this.battleState.emoji;
         this.enemyName.textContent = this.battleState.enemyName;
-        this.enemyRole.textContent = this.battleState.role;
+        const elementLabel = this.battleState.element ? `${this.battleState.element.toUpperCase()}-type` : '';
+        this.enemyRole.textContent = `${this.battleState.role}${elementLabel ? ` • ${elementLabel}` : ''}`;
         this.updateEnemyHealth();
+
+        this.btnAttackGeneral.style.display = 'flex';
+        this.btnAttackFire.style.display = 'flex';
+        this.btnAttackWater.style.display = 'flex';
+        this.btnAttackEarth.style.display = 'flex';
+        this.btnRun.style.display = 'flex';
+        this.btnExplore.style.display = 'none';
     }
 
     showExplore() {
         this.enemySection.style.display = 'none';
-        this.btnFight.style.display = 'none';
+        this.btnAttackGeneral.style.display = 'none';
+        this.btnAttackFire.style.display = 'none';
+        this.btnAttackWater.style.display = 'none';
+        this.btnAttackEarth.style.display = 'none';
         this.btnRun.style.display = 'none';
         this.btnExplore.style.display = 'flex';
     }
@@ -537,6 +609,47 @@ class CosmicQuestGame {
         setTimeout(() => {
             indicator.animation = 'floatUp 1s ease-out forwards';
         }, 10);
+
+        if (source === 'player') {
+            this.animateEnemyHealthbar();
+        }
+    }
+
+    showAttackAnimation(attackType) {
+        const effect = this.attackEffect;
+        if (!effect) return;
+
+        const cleanup = () => {
+            effect.classList.remove('fire', 'water', 'earth', 'general', 'active');
+            effect.removeEventListener('animationend', cleanup);
+        };
+
+        effect.classList.remove('fire', 'water', 'earth', 'general', 'active');
+        void effect.offsetWidth;
+
+        if (attackType === 'fire') {
+            effect.classList.add('fire', 'active');
+        } else if (attackType === 'water') {
+            effect.classList.add('water', 'active');
+        } else if (attackType === 'earth') {
+            effect.classList.add('earth', 'active');
+        } else {
+            effect.classList.add('general', 'active');
+        }
+
+        effect.addEventListener('animationend', cleanup);
+
+        setTimeout(() => {
+            cleanup();
+        }, 700);
+    }
+
+    animateEnemyHealthbar() {
+        const bar = this.enemyHPBar;
+        if (!bar) return;
+        bar.classList.remove('damage-rattle');
+        void bar.offsetWidth;
+        bar.classList.add('damage-rattle');
     }
 
     narrate(text) {

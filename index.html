@@ -79,6 +79,7 @@
 
                 <!-- Enemy Section -->
                 <div class="enemy-section" id="enemySection" style="display: none;">
+                    <div class="attack-effect" id="attackEffect"></div>
                     <div class="enemy-container">
                         <div class="enemy-portrait" id="enemyPortrait"></div>
                         <div class="enemy-info">
@@ -103,9 +104,25 @@
                         <span class="icon">🔍</span>
                         <span class="text">Explore</span>
                     </button>
-                    <button class="btn btn-fight" id="btnFight" style="display: none;">
+                    <button class="btn btn-attack btn-general" id="btnAttackGeneral" style="display: none;">
                         <span class="icon">⚔️</span>
-                        <span class="text">Fight</span>
+                        <span class="text">Basic Strike</span>
+                        <span class="attack-count" id="attackCountGeneral">∞</span>
+                    </button>
+                    <button class="btn btn-attack btn-fire" id="btnAttackFire" style="display: none;">
+                        <span class="icon">🔥</span>
+                        <span class="text">Fire Strike</span>
+                        <span class="attack-count" id="attackCountFire">3</span>
+                    </button>
+                    <button class="btn btn-attack btn-water" id="btnAttackWater" style="display: none;">
+                        <span class="icon">🌊</span>
+                        <span class="text">Water Blast</span>
+                        <span class="attack-count" id="attackCountWater">3</span>
+                    </button>
+                    <button class="btn btn-attack btn-earth" id="btnAttackEarth" style="display: none;">
+                        <span class="icon">🌿</span>
+                        <span class="text">Earth Hammer</span>
+                        <span class="attack-count" id="attackCountEarth">3</span>
                     </button>
                     <button class="btn btn-run" id="btnRun" style="display: none;">
                         <span class="icon">🏃</span>

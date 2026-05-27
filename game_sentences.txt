@@ -1,0 +1,67 @@
+🎮 Cosmic Quest: The Dungeon Reckoning
+🎬 COSMIC QUEST
+The Dungeon Reckoning
+⚔️ HERO
+HEALTH
+LEVEL
+EXP
+GOLD
+DAMAGE
+ROOM
+Defeated Foes
+Awaiting your command, brave warrior...
+Enemy
+You stand at the entrance of a vast, mysterious dungeon. The air is thick with ancient magic. What will you do?
+Explore
+Basic Strike
+Fire Strike
+Water Blast
+Earth Hammer
+Run
+Quit
+Game started. Your journey begins...
+🏆 LEADERBOARD
+No leaderboard entries yet. Finish a run to record your score!
+GAME OVER
+Level Reached:
+Gold Collected:
+Enemies Defeated:
+Bosses Defeated:
+Enter name for leaderboard
+Hero
+💾 Save Score
+🔄 Play Again
+Something STIRS in the darkness! A ${monster.name} EMERGES!
+AT LAST! A figure of POWER emerges from the shadows! It's ${boss.name}, ${boss.role}!
+YOU FIND TREASURE! +${amount} GOLD GAINED!
+✨ You discover a chest containing ${amount} gold coins! Your fortune grows!
+Found ${amount} gold coins!
+The room is empty and silent. Only dust and shadows remain.
+A vast chamber stretches before you, utterly barren.
+Nothing here but the echo of your footsteps.
+An empty hall, waiting for what comes next.
+Silence. Pure, absolute silence.
+An empty chamber...
+Explored an empty room
+No ${attackType} attacks remaining!
+You used ${typeLabel} and dealt ${damage} damage to ${enemyName}!${effectiveness}
+${enemyName} dealt ${enemyDamage} damage to you!
+VICTORY! ${enemyName} falls! +${xpGain} XP, +${lootGain} GOLD!
+You have defeated ${enemyName}! You gain ${xpGain} XP and ${lootGain} gold.
+Defeated ${enemyName}! +${xpGain} XP, +${lootGain} gold
+You FLEE from ${this.battleState.enemyName}!
+You manage to escape, breathless and unharmed!
+Escaped from ${this.battleState.enemyName}
+${this.battleState.enemyName} CATCHES YOU!
+You failed to escape! ${this.battleState.enemyName} catches you and deals ${damage} damage!
+Failed to escape! Took ${damage} damage
+LEVEL UP! You are now level ${this.gameState.level}! Your power increases!
+⬆️ LEVEL UP! Now level ${this.gameState.level}! Elemental attacks have been restocked.
+NO! You have been DEFEATED! Your journey ends here...
+You FLEE the dungeon and escape with your life!
+⚔️ YOU ESCAPED!
+You survived the dungeon and escaped with your life and fortune intact. Your legend will be remembered...
+💀 GAME OVER
+You have fallen in the depths of the dungeon. Your story has ended, but the dungeon remains eternal...
+No defeats yet...
+Welcome to COSMIC QUEST! Your adventure in the dungeon awaits...
