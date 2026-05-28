@@ -971,6 +971,155 @@ body {
     background: linear-gradient(180deg, var(--accent), var(--secondary));
 }
 
+/* ============ SHOP STYLES ============ */
+.btn-shop {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    border-color: #ff6b6b;
+}
+
+.btn-shop:hover {
+    box-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+    transform: translateY(-2px);
+}
+
+.shop-modal {
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.shop-modal h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: var(--success);
+    text-shadow: 0 0 15px rgba(0, 217, 159, 0.6);
+}
+
+.shop-info {
+    color: var(--text-light);
+    margin-bottom: 20px;
+    font-size: 0.95em;
+}
+
+.shop-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.shop-item {
+    background: rgba(15, 15, 30, 0.9);
+    border: 2px solid var(--secondary);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.shop-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(111, 0, 210, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.shop-item:hover::before {
+    left: 100%;
+}
+
+.shop-item.disabled {
+    opacity: 0.5;
+    border-color: #444;
+}
+
+.shop-item.available {
+    border-color: var(--success);
+    box-shadow: 0 0 15px rgba(0, 217, 159, 0.3);
+}
+
+.shop-item.available:hover {
+    box-shadow: 0 0 25px rgba(0, 217, 159, 0.6);
+    transform: translateY(-5px);
+}
+
+.shop-item-icon {
+    font-size: 2.5em;
+    text-align: center;
+}
+
+.shop-item-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.shop-item-effect {
+    color: var(--text-light);
+    font-size: 0.9em;
+}
+
+.shop-item-locked {
+    color: var(--warning);
+    font-size: 0.85em;
+    font-style: italic;
+}
+
+.shop-item-cost {
+    font-size: 1.3em;
+    color: var(--success);
+    font-weight: bold;
+    text-align: center;
+}
+
+.shop-item-btn {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
+    border: 1px solid var(--accent);
+    color: var(--text-light);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.shop-item-btn:hover:not(:disabled) {
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.6);
+    transform: scale(1.05);
+}
+
+.shop-item-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #444, #555);
+}
+
+.shop-gold {
+    margin: 20px 0;
+    font-size: 1.3em;
+    color: var(--success);
+    text-align: center;
+}
+
+.btn-close {
+    background: linear-gradient(135deg, var(--danger), #ff3333);
+    border-color: var(--danger);
+    margin-top: 20px;
+    padding: 12px 30px;
+}
+
+.btn-close:hover {
+    box-shadow: 0 0 25px rgba(255, 0, 81, 0.6);
+}
+
 /* ============ RESPONSIVE ============ */
 @media (max-width: 1200px) {
     .game-main {
@@ -994,5 +1143,9 @@ body {
 
     .action-buttons {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .shop-items {
+        grid-template-columns: 1fr;
     }
 }

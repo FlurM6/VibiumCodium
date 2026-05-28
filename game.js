@@ -58,8 +58,12 @@ class CosmicQuestGame {
         this.roomDescription = document.getElementById('roomDescription');
         this.damageIndicator = document.getElementById('damageIndicator');
         this.gameOverModal = document.getElementById('gameOverModal');
+        this.shopModal = document.getElementById('shopModal');
+        this.shopItemsContainer = document.getElementById('shopItems');
+        this.shopGoldDisplay = document.getElementById('shopGold');
 
         this.btnExplore = document.getElementById('btnExplore');
+        this.btnShop = document.getElementById('btnShop');
         this.btnAttackGeneral = document.getElementById('btnAttackGeneral');
         this.btnAttackFire = document.getElementById('btnAttackFire');
         this.btnAttackWater = document.getElementById('btnAttackWater');
@@ -81,6 +85,7 @@ class CosmicQuestGame {
 
     setupEventListeners() {
         this.btnExplore.addEventListener('click', () => this.exploreRoom());
+        this.btnShop.addEventListener('click', () => this.openShop());
         this.btnAttackGeneral.addEventListener('click', () => this.attackEnemy('general'));
         this.btnAttackFire.addEventListener('click', () => this.attackEnemy('fire'));
         this.btnAttackWater.addEventListener('click', () => this.attackEnemy('water'));
@@ -89,6 +94,10 @@ class CosmicQuestGame {
         this.btnQuit.addEventListener('click', () => this.quitGame());
         this.btnRestart.addEventListener('click', () => location.reload());
         this.btnSaveScore.addEventListener('click', () => this.saveScore());
+        const btnCloseShop = document.getElementById('btnCloseShop');
+        if (btnCloseShop) {
+            btnCloseShop.addEventListener('click', () => this.closeShop());
+        }
         this.leaderboardNameInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -123,10 +132,90 @@ class CosmicQuestGame {
     }
 
     handleShopKeyboard(event) {
-        // Placeholder - will be expanded when shop methods are available
         if (event.key === 'Escape') {
-            this.closeShop?.();
+            this.closeShop();
         }
+    }
+
+    // ============ STORE ITEMS ============
+    getStoreItems() {
+        return [
+            { id: 'health_boost_1', name: 'Health Elixir', icon: '🩹', cost: 50, level: 1, effect: 'maxHP +30', action: () => { this.gameState.maxHP += 30; this.gameState.playerHP = this.gameState.maxHP; } },
+            { id: 'damage_boost_1', name: 'Strength Potion', icon: '💪', cost: 75, level: 2, effect: 'Base Damage +2', action: () => { this.gameState.baseDamage += 2; } },
+            { id: 'elemental_recharge_1', name: 'Elemental Core', icon: '⚡', cost: 100, level: 3, effect: 'Elemental Uses +3', action: () => { this.gameState.maxElementalUses += 3; this.gameState.elementalUses.fire += 3; this.gameState.elementalUses.water += 3; this.gameState.elementalUses.earth += 3; } },
+            { id: 'health_boost_2', name: 'Supreme Elixir', icon: '🌟', cost: 150, level: 5, effect: 'maxHP +50', action: () => { this.gameState.maxHP += 50; this.gameState.playerHP = this.gameState.maxHP; } },
+            { id: 'damage_boost_2', name: 'Warrior\'s Blessing', icon: '⚔️', cost: 200, level: 7, effect: 'Base Damage +4', action: () => { this.gameState.baseDamage += 4; } },
+            { id: 'regeneration', name: 'Healing Aura', icon: '✨', cost: 250, level: 10, effect: 'Restore 50 HP', action: () => { this.gameState.playerHP = Math.min(this.gameState.playerHP + 50, this.gameState.maxHP); } },
+        ];
+    }
+
+    openShop() {
+        if (this.battleState.inBattle) {
+            this.addLog('You cannot shop while in battle!', 'warning');
+            return;
+        }
+
+        this.shopModal.style.display = 'flex';
+        this.renderShopItems();
+    }
+
+    closeShop() {
+        this.shopModal.style.display = 'none';
+    }
+
+    renderShopItems() {
+        const items = this.getStoreItems();
+        const playerLevel = this.gameState.level;
+        const playerGold = this.gameState.gold;
+
+        let html = '';
+        items.forEach(item => {
+            const unlocked = playerLevel >= item.level;
+            const canAfford = playerGold >= item.cost;
+            const disabled = !unlocked || !canAfford;
+            const reasonNotAvailable = !unlocked ? `Unlocks at Level ${item.level}` : !canAfford ? `Need ${item.cost - playerGold} more gold` : '';
+
+            html += `
+                <div class="shop-item ${disabled ? 'disabled' : 'available'}">
+                    <div class="shop-item-icon">${item.icon}</div>
+                    <div class="shop-item-details">
+                        <div class="shop-item-name">${item.name}</div>
+                        <div class="shop-item-effect">${item.effect}</div>
+                        ${reasonNotAvailable ? `<div class="shop-item-locked">${reasonNotAvailable}</div>` : ''}
+                    </div>
+                    <div class="shop-item-cost">${item.cost}g</div>
+                    <button class="btn shop-item-btn" ${disabled ? 'disabled' : ''} onclick="window.game.purchaseItem('${item.id}')">
+                        ${unlocked ? canAfford ? 'Buy' : 'Poor' : 'Locked'}
+                    </button>
+                </div>
+            `;
+        });
+
+        this.shopItemsContainer.innerHTML = html;
+        this.shopGoldDisplay.textContent = this.gameState.gold;
+    }
+
+    purchaseItem(itemId) {
+        const items = this.getStoreItems();
+        const item = items.find(i => i.id === itemId);
+
+        if (!item) return;
+
+        if (this.gameState.level < item.level) {
+            this.addLog(`This item is locked until level ${item.level}!`, 'warning');
+            return;
+        }
+
+        if (this.gameState.gold < item.cost) {
+            this.addLog(`You don't have enough gold! Need ${item.cost - this.gameState.gold} more.`, 'warning');
+            return;
+        }
+
+        this.gameState.gold -= item.cost;
+        item.action();
+        this.addLog(`✨ Purchased ${item.name}! ${item.effect}`, 'victory');
+        this.renderShopItems();
+        this.updateUI();
     }
 
     // ============ GAME FLOW ============
@@ -162,7 +251,8 @@ class CosmicQuestGame {
     }
 
     spawnMonster() {
-        const monsters = [
+        // Base monster stats
+        const baseMonsters = [
             { name: 'Goblin', hp: 6, damage: 2, xp: 10, loot: 5, emoji: '👺', element: 'earth' },
             { name: 'Orc', hp: 12, damage: 3, xp: 20, loot: 15, emoji: '🗡️', element: 'earth' },
             { name: 'Skeleton', hp: 10, damage: 2, xp: 15, loot: 10, emoji: '💀', element: 'fire' },
@@ -173,7 +263,20 @@ class CosmicQuestGame {
             { name: 'Stone Golem', hp: 18, damage: 3, xp: 35, loot: 30, emoji: '🪨', element: 'earth' }
         ];
 
-        const monster = monsters[Math.floor(Math.random() * monsters.length)];
+        const baseMonster = baseMonsters[Math.floor(Math.random() * baseMonsters.length)];
+        
+        // Scale monster stats based on player level
+        const levelScale = Math.max(1, 0.5 + (this.gameState.level - 1) * 0.15);
+        const monster = {
+            name: baseMonster.name,
+            hp: Math.ceil(baseMonster.hp * levelScale),
+            damage: Math.ceil(baseMonster.damage * levelScale),
+            xp: Math.ceil(baseMonster.xp * levelScale),
+            loot: Math.ceil(baseMonster.loot * levelScale),
+            emoji: baseMonster.emoji,
+            element: baseMonster.element
+        };
+
         this.battleState = {
             inBattle: true,
             enemyName: monster.name,
@@ -185,7 +288,7 @@ class CosmicQuestGame {
             enemyType: 'monster',
             element: monster.element,
             emoji: monster.emoji,
-            role: `A menacing ${monster.name} appears!`
+            role: `A menacing ${monster.name} appears! (Level ${this.gameState.level} Encounter)`
         };
 
         this.narrate(`Something STIRS in the darkness! A ${monster.name} EMERGES!`);
@@ -193,16 +296,34 @@ class CosmicQuestGame {
     }
 
     spawnBoss() {
-        const bosses = [
-            { name: 'Fernando', hp: 12, damage: 3, xp: 50, loot: 15, emoji: '🎭', role: 'The Charmer', element: 'fire' },
-            { name: 'Astle', hp: 18, damage: 4, xp: 70, loot: 30, emoji: '⚔️', role: 'The Warrior', element: 'earth' },
-            { name: 'Felizian', hp: 25, damage: 5, xp: 100, loot: 50, emoji: '🧙', role: 'The Sorcerer', element: 'water' },
-            { name: 'Irene', hp: 16, damage: 4, xp: 75, loot: 35, emoji: '🗡️', role: 'The Assassin', element: 'fire' },
-            { name: 'Darko', hp: 35, damage: 7, xp: 150, loot: 100, emoji: '👿', role: 'The Dark Lord', element: 'earth' },
-            { name: 'Meera', hp: 28, damage: 6, xp: 120, loot: 75, emoji: '⚡', role: 'The Betrayer', element: 'water' }
+        // Base boss stats with ±10% variation
+        const baseBosses = [
+            { name: 'Fernando', hp: 20, damage: 5, xp: 80, loot: 40, emoji: '🎭', role: 'The Charmer', element: 'fire' },
+            { name: 'Astle', hp: 22, damage: 5, xp: 90, loot: 45, emoji: '⚔️', role: 'The Warrior', element: 'earth' },
+            { name: 'Felizian', hp: 24, damage: 5, xp: 100, loot: 50, emoji: '🧙', role: 'The Sorcerer', element: 'water' },
+            { name: 'Irene', hp: 21, damage: 5, xp: 85, loot: 42, emoji: '🗡️', role: 'The Assassin', element: 'fire' },
+            { name: 'Darko', hp: 26, damage: 6, xp: 120, loot: 60, emoji: '👿', role: 'The Dark Lord', element: 'earth' },
+            { name: 'Meera', hp: 23, damage: 5, xp: 95, loot: 48, emoji: '⚡', role: 'The Betrayer', element: 'water' }
         ];
 
-        const boss = bosses[Math.floor(Math.random() * bosses.length)];
+        const baseBoss = baseBosses[Math.floor(Math.random() * baseBosses.length)];
+        
+        // Add ±10% random variation to base stats
+        const variation = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
+        
+        // Scale boss stats based on player level
+        const levelScale = Math.max(1, 0.5 + (this.gameState.level - 1) * 0.2);
+        const boss = {
+            name: baseBoss.name,
+            hp: Math.ceil(baseBoss.hp * variation * levelScale),
+            damage: Math.ceil(baseBoss.damage * variation * levelScale),
+            xp: Math.ceil(baseBoss.xp * variation * levelScale),
+            loot: Math.ceil(baseBoss.loot * variation * levelScale),
+            emoji: baseBoss.emoji,
+            role: baseBoss.role,
+            element: baseBoss.element
+        };
+
         this.battleState = {
             inBattle: true,
             enemyName: boss.name,
@@ -217,7 +338,7 @@ class CosmicQuestGame {
             role: boss.role
         };
 
-        this.narrate(`AT LAST! A figure of POWER emerges from the shadows! It's ${boss.name}, ${boss.role}!`);
+        this.narrate(`AT LAST! A figure of POWER emerges from the shadows! It's ${boss.name}, ${boss.role}! (Level ${this.gameState.level} Encounter)`);
         this.showBattle();
     }
 
@@ -273,9 +394,20 @@ class CosmicQuestGame {
         let effectiveness = '';
 
         if (attackType !== 'general' && attackType === elementName) {
-            damage = Math.ceil(damage * 1.5);
-            effectiveness = ' It is super effective!';
+            // Same element attack is WEAK (25% damage) instead of strong
+            damage = Math.ceil(damage * 0.25);
+            effectiveness = ' The enemy\'s defense is too strong against this type!';
+        } else if (attackType !== 'general' && elementName !== 'none') {
+            // Check for element advantage
+            const hasAdvantage = (attackType === 'fire' && elementName === 'earth') || 
+                                (attackType === 'water' && elementName === 'fire') ||
+                                (attackType === 'earth' && elementName === 'water');
+            if (hasAdvantage) {
+                damage = Math.ceil(damage * 1.5);
+                effectiveness = ' It is super effective!';
+            }
         }
+
 
         this.battleState.enemyHP -= damage;
         this.showAttackAnimation(attackType);

@@ -104,6 +104,10 @@
                         <span class="icon">🔍</span>
                         <span class="text">Explore</span>
                     </button>
+                    <button class="btn btn-shop" id="btnShop">
+                        <span class="icon">🏪</span>
+                        <span class="text">Shop</span>
+                    </button>
                     <button class="btn btn-attack btn-general" id="btnAttackGeneral" style="display: none;">
                         <span class="icon">⚔️</span>
                         <span class="text">Basic Strike</span>
@@ -153,6 +157,17 @@
                 </div>
             </aside>
         </main>
+
+        <!-- Shop Modal -->
+        <div class="modal" id="shopModal" style="display: none;">
+            <div class="modal-content shop-modal">
+                <h1>🏪 MAGICAL SHOP</h1>
+                <p class="shop-info">Purchase items to enhance your abilities!</p>
+                <div class="shop-items" id="shopItems"></div>
+                <div class="shop-gold">Gold: <span id="shopGold">0</span></div>
+                <button class="btn btn-close" id="btnCloseShop">Close Shop</button>
+            </div>
+        </div>
 
         <!-- Game Over Modal -->
         <div class="modal" id="gameOverModal" style="display: none;">
