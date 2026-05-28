@@ -13,7 +13,7 @@ class CosmicQuestGame {
             roomCount: 0,
             kills: [],
             bosses: [],
-            elementalUses: { fire: 3, water: 3, earth: 3 },
+            elementalUses: { fire: 3, water: 3, earth: 3, air: 3 },
             maxElementalUses: 3,
             leaderboard: [],
             gameOver: false,
@@ -68,10 +68,12 @@ class CosmicQuestGame {
         this.btnAttackFire = document.getElementById('btnAttackFire');
         this.btnAttackWater = document.getElementById('btnAttackWater');
         this.btnAttackEarth = document.getElementById('btnAttackEarth');
+        this.btnAttackAir = document.getElementById('btnAttackAir');
         this.attackCountGeneral = document.getElementById('attackCountGeneral');
         this.attackCountFire = document.getElementById('attackCountFire');
         this.attackCountWater = document.getElementById('attackCountWater');
         this.attackCountEarth = document.getElementById('attackCountEarth');
+        this.attackCountAir = document.getElementById('attackCountAir');
         this.btnRun = document.getElementById('btnRun');
         this.btnQuit = document.getElementById('btnQuit');
         this.btnRestart = document.getElementById('btnRestart');
@@ -90,6 +92,7 @@ class CosmicQuestGame {
         this.btnAttackFire.addEventListener('click', () => this.attackEnemy('fire'));
         this.btnAttackWater.addEventListener('click', () => this.attackEnemy('water'));
         this.btnAttackEarth.addEventListener('click', () => this.attackEnemy('earth'));
+        this.btnAttackAir.addEventListener('click', () => this.attackEnemy('air'));
         this.btnRun.addEventListener('click', () => this.runAway());
         this.btnQuit.addEventListener('click', () => this.quitGame());
         this.btnRestart.addEventListener('click', () => location.reload());
@@ -125,6 +128,7 @@ class CosmicQuestGame {
             if (key === '2') this.attackEnemy('fire');
             if (key === '3') this.attackEnemy('water');
             if (key === '4') this.attackEnemy('earth');
+            if (key === '5') this.attackEnemy('air');
         }
         if (key === 'r') this.runAway();
         if (key === 's') this.openShop?.();
@@ -260,7 +264,8 @@ class CosmicQuestGame {
             { name: 'Shadow Beast', hp: 14, damage: 4, xp: 25, loot: 20, emoji: '🐺', element: 'water' },
             { name: 'Flame Elemental', hp: 11, damage: 4, xp: 22, loot: 18, emoji: '🔥', element: 'fire' },
             { name: 'Frost Wraith', hp: 9, damage: 3, xp: 18, loot: 12, emoji: '❄️', element: 'water' },
-            { name: 'Stone Golem', hp: 18, damage: 3, xp: 35, loot: 30, emoji: '🪨', element: 'earth' }
+            { name: 'Stone Golem', hp: 18, damage: 3, xp: 35, loot: 30, emoji: '🪨', element: 'earth' },
+            { name: 'Air Sprite', hp: 7, damage: 3, xp: 16, loot: 14, emoji: '💨', element: 'air' }
         ];
 
         const baseMonster = baseMonsters[Math.floor(Math.random() * baseMonsters.length)];
@@ -401,7 +406,9 @@ class CosmicQuestGame {
             // Check for element advantage
             const hasAdvantage = (attackType === 'fire' && elementName === 'earth') || 
                                 (attackType === 'water' && elementName === 'fire') ||
-                                (attackType === 'earth' && elementName === 'water');
+                                (attackType === 'earth' && elementName === 'water') ||
+                                (attackType === 'air' && elementName === 'earth') ||
+                                (attackType === 'earth' && elementName === 'air');
             if (hasAdvantage) {
                 damage = Math.ceil(damage * 1.5);
                 effectiveness = ' It is super effective!';
@@ -600,6 +607,7 @@ class CosmicQuestGame {
         this.gameState.elementalUses.fire = this.gameState.maxElementalUses;
         this.gameState.elementalUses.water = this.gameState.maxElementalUses;
         this.gameState.elementalUses.earth = this.gameState.maxElementalUses;
+        this.gameState.elementalUses.air = this.gameState.maxElementalUses;
         this.updateUI();
     }
 
@@ -673,9 +681,11 @@ class CosmicQuestGame {
         if (this.attackCountFire) this.attackCountFire.textContent = this.gameState.elementalUses.fire;
         if (this.attackCountWater) this.attackCountWater.textContent = this.gameState.elementalUses.water;
         if (this.attackCountEarth) this.attackCountEarth.textContent = this.gameState.elementalUses.earth;
+        if (this.attackCountAir) this.attackCountAir.textContent = this.gameState.elementalUses.air;
         if (this.btnAttackFire) this.btnAttackFire.disabled = this.gameState.elementalUses.fire <= 0;
         if (this.btnAttackWater) this.btnAttackWater.disabled = this.gameState.elementalUses.water <= 0;
         if (this.btnAttackEarth) this.btnAttackEarth.disabled = this.gameState.elementalUses.earth <= 0;
+        if (this.btnAttackAir) this.btnAttackAir.disabled = this.gameState.elementalUses.air <= 0;
 
         // Update kills list
         this.updateKillsList();
@@ -717,6 +727,7 @@ class CosmicQuestGame {
         this.btnAttackFire.style.display = 'flex';
         this.btnAttackWater.style.display = 'flex';
         this.btnAttackEarth.style.display = 'flex';
+        this.btnAttackAir.style.display = 'flex';
         this.btnRun.style.display = 'flex';
         this.btnExplore.style.display = 'none';
     }
@@ -727,6 +738,7 @@ class CosmicQuestGame {
         this.btnAttackFire.style.display = 'none';
         this.btnAttackWater.style.display = 'none';
         this.btnAttackEarth.style.display = 'none';
+        this.btnAttackAir.style.display = 'none';
         this.btnRun.style.display = 'none';
         this.btnExplore.style.display = 'flex';
     }
@@ -752,11 +764,11 @@ class CosmicQuestGame {
         if (!effect) return;
 
         const cleanup = () => {
-            effect.classList.remove('fire', 'water', 'earth', 'general', 'active');
+            effect.classList.remove('fire', 'water', 'earth', 'air', 'general', 'active');
             effect.removeEventListener('animationend', cleanup);
         };
 
-        effect.classList.remove('fire', 'water', 'earth', 'general', 'active');
+        effect.classList.remove('fire', 'water', 'earth', 'air', 'general', 'active');
         void effect.offsetWidth;
 
         if (attackType === 'fire') {
@@ -765,6 +777,8 @@ class CosmicQuestGame {
             effect.classList.add('water', 'active');
         } else if (attackType === 'earth') {
             effect.classList.add('earth', 'active');
+        } else if (attackType === 'air') {
+            effect.classList.add('air', 'active');
         } else {
             effect.classList.add('general', 'active');
         }

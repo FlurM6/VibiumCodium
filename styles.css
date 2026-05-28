@@ -730,6 +730,14 @@ body {
     box-shadow: 0 0 20px rgba(139, 195, 74, 0.6);
 }
 
+.btn-air {
+    border-color: #64b5f6;
+}
+
+.btn-air:hover {
+    box-shadow: 0 0 20px rgba(100, 181, 246, 0.6);
+}
+
 .enemy-section.attack-general {
     animation: attackGeneral 0.35s ease-out;
 }
@@ -744,6 +752,10 @@ body {
 
 .enemy-section.attack-earth {
     animation: attackEarth 0.35s ease-out;
+}
+
+.enemy-section.attack-air {
+    animation: attackAir 0.35s ease-out;
 }
 
 @keyframes attackGeneral {
@@ -770,6 +782,12 @@ body {
     50% { box-shadow: 0 0 40px rgba(139, 195, 74, 0.7); transform: translateX(2px); }
     75% { transform: translateX(-1px); }
     100% { box-shadow: none; transform: translateX(0); }
+}
+
+@keyframes attackAir {
+    0% { box-shadow: none; transform: scale(1); }
+    50% { box-shadow: 0 0 40px rgba(100, 181, 246, 0.7); transform: scale(1.02) rotate(1deg); }
+    100% { box-shadow: none; transform: scale(1) rotate(0deg); }
 }
 
 .btn-run {
